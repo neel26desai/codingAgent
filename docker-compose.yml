@@ -1,0 +1,16 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80" # Expose the frontend on localhost:80
+    depends_on:
+      - backend # Ensure backend starts before frontend
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - 5500:5500 # Expose the backend on localhost:5500
+    environment:
+      - PYTHONUNBUFFERED=1

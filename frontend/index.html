@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeGeneration Chatbot</title>
+  <style>
+  html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f8;
+}
+
+#chat-container {
+  width: 100vw; /* Full screen width */
+  height: 100vh; /* Full screen height */
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+#messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9; /* Optional: subtle background for the chat area */
+}
+
+.message {
+  margin: 8px 0;
+  padding: 10px 15px;
+  border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #d1e8ff;
+  color: #00529b;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background-color: #f1f0f0;
+  color: #333333;
+}
+
+#input-container {
+  display: flex;
+  border-top: 1px solid #e0e0e0;
+  padding: 10px;
+  background-color: #f7f7f8;
+}
+
+#userInput {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  font-size: 16px;
+}
+
+#sendButton {
+  margin-left: 10px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#sendButton:hover {
+  background-color: #0056b3;
+}
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="messages"></div>
+    <div id="input-container">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button id="sendButton">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const sendButton = document.getElementById('sendButton');
+    const userInput = document.getElementById('userInput');
+    const messages = document.getElementById('messages');
+
+    sendButton.addEventListener('click', async () => {
+  const userMessage = userInput.value.trim();
+  if (!userMessage) return;
+
+  // Display user message
+  const userDiv = document.createElement('div');
+  userDiv.className = 'message user-message';
+  userDiv.textContent = userMessage;
+  messages.appendChild(userDiv);
+  messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom
+
+  // Clear input
+  userInput.value = '';
+
+  // Fetch response from backend
+  try {
+    const response = await fetch('http://localhost:5500/respond', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMessage })
+    });
+    const data = await response.json();
+
+    // Display bot message with preserved formatting
+    const botDiv = document.createElement('div');
+    botDiv.className = 'message bot-message';
+
+    const preElement = document.createElement('pre');
+    preElement.textContent = data.reply; // Use preformatted text
+    botDiv.appendChild(preElement);
+
+    messages.appendChild(botDiv);
+    messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom
+  } catch (error) {
+    console.error('Error communicating with backend:', error);
+  }
+});
+
+
+    // Allow "Enter" key to send message
+    userInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        sendButton.click();
+      }
+    });
+  </script>
+</body>
+</html>

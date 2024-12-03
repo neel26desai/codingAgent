@@ -1,0 +1,7 @@
+Flask
+pandas
+numpy
+Flask-Cors
+langchain
+langchain_openai
+python-dotenv
